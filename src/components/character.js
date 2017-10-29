@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
 const Tile = styled.div`
-  background: blue;
+  background: ${props => {
+    return props.color
+  }};
   width: 20px;
   height: 20px;
   position: absolute;
@@ -12,6 +14,7 @@ const Tile = styled.div`
 `
 
 const Character = props => {
+  console.log('Character props:', props)
   return <Tile {...props} />
 }
 

@@ -39,6 +39,7 @@ Map.propTypes = {
   character: PropTypes.shape({
     x: PropTypes.number,
     y: PropTypes.number,
+    color: PropTypes.string,
   }),
 }
 export default Map
