@@ -26,12 +26,12 @@ const Row = ({ data }) => {
   return <Container>{tiles.map((tile, key) => <Tile key={key} tile={tile} />)}</Container>
 }
 
-const Map = ({ level, character, phantom }) => {
+const Map = ({ level, character, phantoms }) => {
   return (
     <Level width={level[0].length * 20} height={level.length * 20}>
       <div>{level.map((str, key) => <Row key={key} data={str} />)}</div>
       <Character {...character} />
-      <Character {...phantom} />
+      {Object.entries(phantoms).map(([k, phantom]) => <Character key={k} {...phantom} />)}
     </Level>
   )
 }

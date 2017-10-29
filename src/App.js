@@ -23,7 +23,7 @@ const initialState = {
       direction: LEFT,
     },
     purple: {
-      y: 10,
+      y: 1,
       x: 11,
       color: 'purple',
       direction: LEFT,
@@ -35,6 +35,7 @@ const initialState = {
     '# ######### #',
     '#           #',
     '# #### #### #',
+    '# #  # #  # #',
     '# #### #### #',
     '#           #',
     '# #### #### #',
@@ -55,21 +56,25 @@ const next = character => {
     case LEFT:
       return {
         ...character,
+        direction,
         x: x - 1,
       }
     case RIGHT:
       return {
         ...character,
+        direction,
         x: x + 1,
       }
     case UP:
       return {
         ...character,
+        direction,
         y: y - 1,
       }
     case DOWN:
       return {
         ...character,
+        direction,
         y: y + 1,
       }
     default:
@@ -98,23 +103,23 @@ class App extends Component {
 
   componentDidMount() {
     setInterval(() => {
-      const nextCharacter = next(this.state.character)
+      const character = next(this.state.character)
+      const phantoms = Object
+        .entries(this.state.phantoms)
+        .map(([key, phantom]) => ({[key]: untilValid(phantom, this.state.level) }))
+        .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
       this.setState({
-        character: isValid(nextCharacter, this.state.level) ? nextCharacter : this.state.character,
-        phantoms: {
-          yellow: untilValid(this.state.phantoms.yellow, this.state.level),
-        },
+        character: isValid(character, this.state.level) ? character : this.state.character,
+        phantoms,
       })
-    }, 1000)
+    }, 200)
 
     window.addEventListener(
       'keydown',
       e => {
-        const { x, y } = this.state.character
         this.setState({
           character: {
-            x,
-            y,
+            ...this.state.character,
             direction: e.keyCode,
           },
         })
@@ -133,7 +138,7 @@ class App extends Component {
           <Map
             level={this.state.level}
             character={this.state.character}
-            phantom={this.state.phantoms.yellow} />
+            phantoms={this.state.phantoms} />
         </main>
       </div>
     )

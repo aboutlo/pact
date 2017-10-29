@@ -14,7 +14,6 @@ const Tile = styled.div`
 `
 
 const Character = props => {
-  console.log('Character props:', props)
   return <Tile {...props} />
 }
 
