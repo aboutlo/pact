@@ -29,13 +29,13 @@ const initialState = {
       status: ALIVE,
       direction: LEFT,
     },
-    purple: {
-      y: 1,
-      x: 11,
-      color: 'purple',
-      status: ALIVE,
-      direction: LEFT,
-    },
+    // purple: {
+    //   y: 1,
+    //   x: 11,
+    //   color: 'purple',
+    //   status: ALIVE,
+    //   direction: LEFT,
+    // },
   },
   level: [
     '#############',
@@ -54,7 +54,7 @@ const initialState = {
   ],
 }
 
-const pickDirection= () => {
+const pickDirection = () => {
   const index = Math.round(Math.random() * 3)
   return DIRECTIONS[index]
 }
@@ -90,32 +90,32 @@ const next = character => {
   }
 }
 const status = (character, state) => {
-  const {x, y} = character
-  const phantoms = Object.entries(state.phantoms).map(([k, v]) => (v))
+  const { x, y } = character
+  const phantoms = Object.entries(state.phantoms).map(([k, v]) => v)
   let status = ALIVE
-  if (state.level[Math.abs(y)][x] === '#'){
-    status = INVALID
-  }
-  if (phantoms.filter(p => p.x === x && p.y === y).pop()){
+  if (phantoms.filter(p => p.x === x && p.y === y).pop()) {
     status = DEAD
+  } else if (state.level[Math.abs(y)][x] === '#') {
+    status = INVALID
   }
   return {
     ...character,
-    status
+    status,
   }
 }
-const isValid = (pos, map) => {
-  const { x, y } = pos
-  return map[Math.abs(y)][x] !== '#'
-}
-const untilValid = (character, map) => {
-  const pos = next(character)
-  return isValid(pos, map)
-    ? pos
-    : untilValid({
-      ...character,
-      direction: pickDirection()
-      }, map)
+
+const untilValid = (character, state) => {
+  console.log('character:', character)
+  const pos = status(next(character), state)
+  return pos.status === INVALID
+    ? untilValid(
+        {
+          ...character,
+          direction: pickDirection(),
+        },
+        state
+      )
+    : pos
 }
 
 let interval
@@ -126,23 +126,27 @@ class App extends Component {
     this.state = initialState
   }
 
-  start () {
+  start() {
     interval = setInterval(() => this.tick(), 200)
   }
 
-  stop () {
+  stop() {
     clearInterval(interval)
   }
 
-  tick () {
+  tick() {
     const character = status(next(this.state.character), this.state)
-    const phantoms = Object
-      .entries(this.state.phantoms)
-      .map(([key, phantom]) => ({[key]: untilValid(phantom, this.state.level) }))
-      .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
     if (character.status === DEAD) {
       this.stop()
+      this.setState({
+        character,
+      })
+      return
     }
+    const phantoms = Object.entries(this.state.phantoms)
+      .map(([key, phantom]) => ({ [key]: untilValid(phantom, this.state) }))
+      .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
+
     this.setState({
       character: character.status === INVALID ? this.state.character : character,
       phantoms,
@@ -150,7 +154,6 @@ class App extends Component {
   }
 
   componentDidMount() {
-
     window.addEventListener(
       'keydown',
       e => {
@@ -166,7 +169,7 @@ class App extends Component {
     this.start()
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.stop()
   }
 
@@ -177,10 +180,7 @@ class App extends Component {
           <h1 className="App-title">React Man</h1>
         </header>
         <main>
-          <Map
-            level={this.state.level}
-            character={this.state.character}
-            phantoms={this.state.phantoms} />
+          <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
         </main>
       </div>
     )

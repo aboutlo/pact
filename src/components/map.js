@@ -30,8 +30,8 @@ const Map = ({ level, character, phantoms }) => {
   return (
     <Level width={level[0].length * 20} height={level.length * 20}>
       <div>{level.map((str, key) => <Row key={key} data={str} />)}</div>
-      <Character {...character} />
       {Object.entries(phantoms).map(([k, phantom]) => <Character key={k} {...phantom} />)}
+      <Character {...character} />
     </Level>
   )
 }
