@@ -72,7 +72,7 @@ const pickDirection = () => {
   const index = Math.round(Math.random() * 3)
   return DIRECTIONS[index]
 }
-const next = character => {
+const move = character => {
   const { x, y, direction } = character
   switch (direction) {
     case LEFT:
@@ -118,7 +118,7 @@ const status = (character, state) => {
   }
 }
 const findPath = (character, state) => {
-  const pos = status(next(character), state)
+  const pos = status(move(character), state)
   return pos.status === INVALID
     ? findPath(
         {
@@ -147,7 +147,7 @@ class App extends Component {
   }
 
   tick() {
-    const character = status(next(this.state.character), this.state)
+    const character = status(move(this.state.character), this.state)
     if (character.status === DEAD) {
       this.stop()
       this.setState({

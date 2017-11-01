@@ -1,10 +1,14 @@
-import { LEFT, RIGHT, UP, DOWN } from '../constants/directions'
+import DIRECTIONS, { LEFT, RIGHT, UP, DOWN } from '../constants/directions'
+import { ALIVE, DEAD, INVALID } from '../constants/status'
 
 export const pipe = (f1, ...fns) => (...args) => {
   return fns.reduce((res, fn) => fn(res), f1(...args))
 }
 
-export const next = character => {
+export const curry = (f, arr = [], length = f.length) => (...args) =>
+  (a => (a.length === length ? f(...a) : curry(f, a)))([...arr, ...args])
+
+export const move = character => {
   const { x, y, direction } = character
   switch (direction) {
     case LEFT:
@@ -35,17 +39,34 @@ export const next = character => {
       return character
   }
 }
-export const status = (character, state) => {
+export const health = curry((phantoms, character) => {
   const { x, y } = character
-  const phantoms = Object.entries(state.phantoms).map(([k, v]) => v)
-  let status = ALIVE
-  if (phantoms.filter(p => p.x === x && p.y === y).pop()) {
-    status = DEAD
-  } else if (state.level[Math.abs(y)][x] === '#') {
-    status = INVALID
-  }
+  const points = Object.entries(phantoms).map(([k, v]) => v)
   return {
     ...character,
-    status,
+    status: points.filter(p => p.x === x && p.y === y).pop() ? DEAD : ALIVE,
   }
+})
+export const obstacle = curry((map, character) => {
+  const { x, y, status } = character
+  const tile = map[y][x]
+  return {
+    ...character,
+    status: tile === '#' || tile === undefined ? INVALID : status,
+  }
+})
+
+const pickDirection = () => {
+  const index = Math.round(Math.random() * 3)
+  return DIRECTIONS[index]
 }
+
+export const findPath = curry((func, character) => {
+  const pos = func(character)
+  return pos.status === INVALID
+    ? findPath(func, {
+        ...character,
+        direction: pickDirection(),
+      })
+    : pos
+})
