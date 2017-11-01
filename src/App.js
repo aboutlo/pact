@@ -12,6 +12,10 @@ const DEAD = 'DEAD'
 const INVALID = 'INVALID'
 const STATUS = [ALIVE, DEAD, INVALID]
 
+const pipe = (f1, ...fns) => (...args) => {
+  return fns.reduce((res, fn) => fn(res), f1(...args));
+};
+
 const initialState = {
   lives: 3,
   character: {
@@ -113,11 +117,10 @@ const status = (character, state) => {
     status,
   }
 }
-
-const untilValid = (character, state) => {
+const findPath = (character, state) => {
   const pos = status(next(character), state)
   return pos.status === INVALID
-    ? untilValid(
+    ? findPath(
         {
           ...character,
           direction: pickDirection(),
@@ -152,8 +155,10 @@ class App extends Component {
       })
       return
     }
+
+    // compose(findPath, status)
     const phantoms = Object.entries(this.state.phantoms)
-      .map(([key, phantom]) => ({ [key]: untilValid(phantom, this.state) }))
+      .map(([key, phantom]) => ({ [key]: findPath(phantom, this.state) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
 
     this.setState({
