@@ -49,7 +49,7 @@ export const health = curry((phantoms, character) => {
 })
 export const obstacle = curry((map, character) => {
   const { x, y, status } = character
-  const tile = map[y][x]
+  const tile = map[x][y]
   return {
     ...character,
     status: tile === '#' || tile === undefined ? INVALID : status,

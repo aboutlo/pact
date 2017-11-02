@@ -185,9 +185,10 @@ describe('utils', () => {
       const phantoms = []
       // prettier-ignore
       const map = [
-        '####',
-        '#  #',
-        '####'
+       //0123
+        '####',//0
+        '#  #',//1
+        '####' //2
       ]
       const f = pipe(move, health(phantoms), obstacle(map))
       expect(findPath(f, character)).toMatchObject({
