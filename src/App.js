@@ -50,7 +50,7 @@ const initialState = {
     '###### ##### ## ##### ######',
     '###### ##          ## ######',
     '###### ## ###  ### ## ######',
-    '###### ## #      # # ######',
+    '###### ## #      # ## ######',
     '          #      #          ',
     '###### ## #      # ## ######',
     '###### ## ######## ## ######',
@@ -67,10 +67,20 @@ const initialState = {
   ],
 }
 
-let interval
+let reqAnimation
+const fps = 5
 
 const tickCharacter = state => pipe(move, health(state.phantoms), obstacle(state.level))(state.character)
 const tickPhantom = state => pipe(move, obstacle(state.level))
+let start = null
+
+function step(timestamp) {
+  if (!start) start = timestamp
+  const progress = timestamp - start
+  if (progress < 2000) {
+    window.requestAnimationFrame(step)
+  }
+}
 
 class App extends Component {
   constructor() {
@@ -79,14 +89,17 @@ class App extends Component {
   }
 
   start() {
-    interval = setInterval(() => this.tick(), 200)
+    reqAnimation = window.requestAnimationFrame(timestamp => this.tick(timestamp))
   }
 
   stop() {
-    clearInterval(interval)
+    cancelAnimationFrame(reqAnimation)
   }
 
-  tick() {
+  tick(timestamp) {
+    if (!start) start = timestamp
+    const progress = timestamp - start
+
     const character = tickCharacter(this.state)
     if (character.status === DEAD) {
       this.stop()
@@ -103,7 +116,12 @@ class App extends Component {
       character: character.status === INVALID ? this.state.character : character,
       phantoms,
     })
+
+    setTimeout(() => {
+      reqAnimation = requestAnimationFrame(timestamp => this.tick(timestamp))
+    }, 1000 / fps)
   }
+  x
 
   componentDidMount() {
     window.addEventListener(
