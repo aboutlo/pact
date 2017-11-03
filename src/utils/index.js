@@ -15,7 +15,7 @@ export const move = character => {
       return {
         ...character,
         direction,
-        x: x - 1,
+        x: Math.max(x - 1, 0),
       }
     case RIGHT:
       return {
@@ -27,7 +27,7 @@ export const move = character => {
       return {
         ...character,
         direction,
-        y: y - 1,
+        y: Math.max(y - 1, 0),
       }
     case DOWN:
       return {
@@ -49,7 +49,7 @@ export const health = curry((phantoms, character) => {
 })
 export const obstacle = curry((map, character) => {
   const { x, y, status } = character
-  const tile = map[x][y]
+  const tile = map[y][x]
   return {
     ...character,
     status: tile === '#' || tile === undefined ? INVALID : status,

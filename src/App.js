@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import './App.css'
 import Map from './components/map'
+import { move, health, obstacle, findPath, pipe } from './utils'
 
 const LEFT = 37
 const UP = 38
@@ -11,10 +12,6 @@ const ALIVE = 'ALIVE'
 const DEAD = 'DEAD'
 const INVALID = 'INVALID'
 const STATUS = [ALIVE, DEAD, INVALID]
-
-const pipe = (f1, ...fns) => (...args) => {
-  return fns.reduce((res, fn) => fn(res), f1(...args));
-};
 
 const initialState = {
   lives: 3,
@@ -27,8 +24,8 @@ const initialState = {
   },
   phantoms: {
     yellow: {
-      y: 10,
-      x: 11,
+      y: 8,
+      x: 12,
       color: 'yellow',
       status: ALIVE,
       direction: LEFT,
@@ -52,8 +49,10 @@ const initialState = {
     '#      ##### ## #####      #',
     '###### ##### ## ##### ######',
     '###### ##          ## ######',
-    '###### ## ######## ## ######',
+    '###### ## ###  ### ## ######',
+    '###### ## #      # # ######',
     '          #      #          ',
+    '###### ## #      # ## ######',
     '###### ## ######## ## ######',
     '###### ##          ## ######',
     '###### ## ######## ## ######',
@@ -68,69 +67,10 @@ const initialState = {
   ],
 }
 
-const pickDirection = () => {
-  const index = Math.round(Math.random() * 3)
-  return DIRECTIONS[index]
-}
-const move = character => {
-  const { x, y, direction } = character
-  switch (direction) {
-    case LEFT:
-      return {
-        ...character,
-        direction,
-        x: x - 1,
-      }
-    case RIGHT:
-      return {
-        ...character,
-        direction,
-        x: x + 1,
-      }
-    case UP:
-      return {
-        ...character,
-        direction,
-        y: y - 1,
-      }
-    case DOWN:
-      return {
-        ...character,
-        direction,
-        y: y + 1,
-      }
-    default:
-      return character
-  }
-}
-const status = (character, state) => {
-  const { x, y } = character
-  const phantoms = Object.entries(state.phantoms).map(([k, v]) => v)
-  let status = ALIVE
-  if (phantoms.filter(p => p.x === x && p.y === y).pop()) {
-    status = DEAD
-  } else if (state.level[Math.abs(y)][x] === '#') {
-    status = INVALID
-  }
-  return {
-    ...character,
-    status,
-  }
-}
-const findPath = (character, state) => {
-  const pos = status(move(character), state)
-  return pos.status === INVALID
-    ? findPath(
-        {
-          ...character,
-          direction: pickDirection(),
-        },
-        state
-      )
-    : pos
-}
-
 let interval
+
+const tickCharacter = state => pipe(move, health(state.phantoms), obstacle(state.level))(state.character)
+const tickPhantom = state => pipe(move, obstacle(state.level))
 
 class App extends Component {
   constructor() {
@@ -147,7 +87,7 @@ class App extends Component {
   }
 
   tick() {
-    const character = status(move(this.state.character), this.state)
+    const character = tickCharacter(this.state)
     if (character.status === DEAD) {
       this.stop()
       this.setState({
@@ -155,10 +95,8 @@ class App extends Component {
       })
       return
     }
-
-    // compose(findPath, status)
     const phantoms = Object.entries(this.state.phantoms)
-      .map(([key, phantom]) => ({ [key]: findPath(phantom, this.state) }))
+      .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
 
     this.setState({
@@ -171,11 +109,13 @@ class App extends Component {
     window.addEventListener(
       'keydown',
       e => {
+        const character = {
+          ...this.state.character,
+          direction: e.keyCode,
+        }
+        console.log('keydown character:', character)
         this.setState({
-          character: {
-            ...this.state.character,
-            direction: e.keyCode,
-          },
+          character,
         })
       },
       true

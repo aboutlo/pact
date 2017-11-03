@@ -197,5 +197,33 @@ describe('utils', () => {
         status: ALIVE,
       })
     })
+
+    it.only('pipe', () => {
+      const character = {
+        x: 1,
+        y: 0,
+        status: ALIVE,
+      }
+      const phantoms = []
+      // prettier-ignore
+      const map = [
+        //0123
+        '####',//0
+        '#  #',//1
+        '####' //2
+      ]
+      // prettier-ignore
+      const f = pipe(
+        move,
+        health(phantoms),
+        obstacle(map),
+        findPath(pipe(move,obstacle(map)))
+      )
+      expect(f(character)).toMatchObject({
+        x: 1,
+        y: 1,
+        status: ALIVE,
+      })
+    })
   })
 })
