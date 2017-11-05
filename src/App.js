@@ -2,16 +2,8 @@ import React, { Component } from 'react'
 import './App.css'
 import Map from './components/map'
 import { move, health, obstacle, findPath, pipe } from './utils'
-
-const LEFT = 37
-const UP = 38
-const RIGHT = 39
-const DOWN = 40
-const DIRECTIONS = [LEFT, UP, RIGHT, DOWN]
-const ALIVE = 'ALIVE'
-const DEAD = 'DEAD'
-const INVALID = 'INVALID'
-const STATUS = [ALIVE, DEAD, INVALID]
+import { DEAD, ALIVE, INVALID } from './constants/status'
+import { LEFT } from './constants/directions'
 
 const initialState = {
   lives: 3,
@@ -40,7 +32,7 @@ const initialState = {
   },
   level: [
     '############################',
-    '#            ##            #',
+    '#●···········##            #',
     '# #### ##### ## ##### #### #',
     '# #### ##### ## ##### #### #',
     '#                          #',
@@ -61,7 +53,7 @@ const initialState = {
     '#   ##                ##   #',
     '### ## # ########## # ## ###',
     '#      #     ##     #      #',
-    '# ########## ## #########  #',
+    '# ########## ## ########## #',
     '#                          #',
     '############################',
   ],
@@ -103,9 +95,20 @@ class App extends Component {
       .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
 
+    const level = this.state.level.map((row, y) => {
+      return (
+        row
+          .split('')
+          // remove dots has to be more idiomatic
+          .map((tile, x) => (y === character.y && x === character.x && character.status !== INVALID ? ' ' : tile))
+          .join('')
+      )
+    })
+
     this.setState({
       character: character.status === INVALID ? this.state.character : character,
       phantoms,
+      level,
     })
 
     setTimeout(() => {
@@ -122,7 +125,7 @@ class App extends Component {
           ...this.state.character,
           direction: e.keyCode,
         }
-        console.log('keydown character:', character)
+        // console.log('keydown character:', character)
         this.setState({
           character,
         })
