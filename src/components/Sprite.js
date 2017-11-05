@@ -33,7 +33,7 @@ const Tile = styled.div.attrs({
   position: absolute;
   background-repeat: no-repeat;
   animation: ${walk} 0.4s steps(2) infinite;
-  transition: left 0.25s linear, top 0.25s linear;
+  /*transition: left 0.25s linear, top 0.25s linear;*/
 `
 
 const Character = props => {

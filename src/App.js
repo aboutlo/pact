@@ -7,6 +7,8 @@ import { LEFT } from './constants/directions'
 
 const initialState = {
   lives: 3,
+  time: Date.now(),
+  score: 0,
   character: {
     y: 1,
     x: 1,
@@ -32,35 +34,35 @@ const initialState = {
   },
   level: [
     '############################',
-    '#●···········##            #',
-    '# #### ##### ## ##### #### #',
-    '# #### ##### ## ##### #### #',
-    '#                          #',
-    '# #### ## ######## ## #### #',
-    '# #### ##    ##    ## #### #',
-    '#      ##### ## #####      #',
-    '###### ##### ## ##### ######',
-    '###### ##          ## ######',
-    '###### ## ###  ### ## ######',
-    '###### ## #      # ## ######',
-    '          #      #          ',
-    '###### ## #      # ## ######',
-    '###### ## ######## ## ######',
-    '###### ##          ## ######',
-    '###### ## ######## ## ######',
-    '#            ##            #',
-    '# #### ##### ## ##### #### #',
-    '#   ##                ##   #',
-    '### ## # ########## # ## ###',
-    '#      #     ##     #      #',
-    '# ########## ## ########## #',
-    '#                          #',
+    '#●···········##···········●#',
+    '#·####·#####·##·#####·####·#',
+    '#·####·#####·##·#####·####·#',
+    '#·····●··············●·····#',
+    '#·####·##·########·##·####·#',
+    '#·####·##····##····##·####·#',
+    '#······#####·##·#####······#',
+    '######·#####·##·#####·######',
+    '######·##··········##·######',
+    '######·##·###··###·##·######',
+    '######·##·#······#·##·######',
+    '······●···#······#···●······',
+    '######·##·#······#·##·######',
+    '######·##·########·##·######',
+    '######·##··········##·######',
+    '######·##·########·##·######',
+    '#·····●······##······●·····#',
+    '#·####·#####·##·#####·####·#',
+    '#···##················##···#',
+    '###·##·#·##########·#·##·###',
+    '#······#·····##·····#······#',
+    '#·##########·##·##########·#',
+    '#●························●#',
     '############################',
   ],
 }
 
 let reqAnimation
-const fps = 5
+const fps = 3
 
 const tickCharacter = state => pipe(move, health(state.phantoms), obstacle(state.level))
 const tickPhantom = state => pipe(move, obstacle(state.level))
@@ -94,7 +96,7 @@ class App extends Component {
     const phantoms = Object.entries(this.state.phantoms)
       .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
-
+    // use reduce to map and count
     const level = this.state.level.map((row, y) => {
       return (
         row
@@ -106,6 +108,7 @@ class App extends Component {
     })
 
     this.setState({
+      // TODO LS move this login into a function eg. shouldUpdate
       character: character.status === INVALID ? this.state.character : character,
       phantoms,
       level,
@@ -144,6 +147,12 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">React Man</h1>
+          <ul>
+            <li>lives:{Array.from({ length: this.state.lives }).map(life => '❤️')}️</li>
+            <li>score:{this.state.score}</li>
+            <li>time:</li>
+            <li>level:1</li>
+          </ul>
         </header>
         <main>
           <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />

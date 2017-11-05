@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 import Character from './Sprite'
 import pacmanAsset from '../assets/pacman.png'
+import pacgirlAsset from '../assets/pacgirl.png'
 import phantomAsset from '../assets/blinky.png'
 
 const SIDE = 16
@@ -11,6 +12,7 @@ const Tile = styled.div`
   width: ${SIDE}px;
   height: ${SIDE}px;
   color: yellow;
+  text-indent: ${({ children }) => (children === '#' ? '-2000px' : 'none')};
 `
 
 const Container = styled.div`
@@ -34,7 +36,7 @@ const Map = ({ level, character, phantoms }) => {
     <Level width={level[0].length * SIDE} height={level.length * SIDE}>
       <div>{level.map((str, key) => <Row key={key} data={str} />)}</div>
       {Object.entries(phantoms).map(([k, phantom]) => <Character key={k} {...phantom} sprite={phantomAsset} />)}
-      <Character {...character} sprite={pacmanAsset} />
+      <Character {...character} sprite={pacgirlAsset} />
     </Level>
   )
 }
