@@ -2,11 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { css } from 'styled-components'
 
-import Character from './character'
-
+import Character from './Sprite'
+const SIDE = 16
 const Tile = styled.div`
-  width: 20px;
-  height: 20px;
+  width: ${SIDE}px;
+  height: ${SIDE}px;
   background: ${props => (props.tile === '#' ? 'black' : 'white')};
 `
 
@@ -28,7 +28,7 @@ const Row = ({ data }) => {
 
 const Map = ({ level, character, phantoms }) => {
   return (
-    <Level width={level[0].length * 20} height={level.length * 20}>
+    <Level width={level[0].length * SIDE} height={level.length * SIDE}>
       <div>{level.map((str, key) => <Row key={key} data={str} />)}</div>
       {Object.entries(phantoms).map(([k, phantom]) => <Character key={k} {...phantom} />)}
       <Character {...character} />
