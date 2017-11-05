@@ -97,20 +97,32 @@ class App extends Component {
       .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
     // use reduce to map and count
+    let score = this.state.score
     const level = this.state.level.map((row, y) => {
-      return (
-        row
-          .split('')
-          // remove dots has to be more idiomatic
-          .map((tile, x) => (y === character.y && x === character.x && character.status !== INVALID ? ' ' : tile))
-          .join('')
-      )
+      return row
+        .split('')
+        .map((tile, x) => {
+          // eating dots has to be more idiomatic and without side effect
+          // I could store the tile into the character and calculate the score later
+          if (y === character.y && x === character.x && character.status !== INVALID) {
+            if (tile === '·') {
+              score += 5
+            }
+            if (tile === '●') {
+              score += 50
+            }
+            return ' '
+          }
+          return tile
+        })
+        .join('')
     })
 
     this.setState({
       // TODO LS move this login into a function eg. shouldUpdate
       character: character.status === INVALID ? this.state.character : character,
       phantoms,
+      score,
       level,
     })
 
