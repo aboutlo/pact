@@ -2,35 +2,38 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled, { css, keyframes } from 'styled-components'
 import { LEFT, RIGHT, DOWN, UP } from '../constants/directions'
-import background from '../assets/blinky.png'
+
 const SIDE = 16
 const walk = keyframes`
   100% {background-position-x: -32px;}
 `
-const Tile = styled.div`
+
+const getBackgroundPositionY = direction => {
+  switch (direction) {
+    case RIGHT:
+      return `0px`
+    case LEFT:
+      return `-${SIDE}px`
+    case UP:
+      return `-${SIDE * 2}px`
+    case DOWN:
+      return `-${SIDE * 3}px`
+  }
+}
+const Tile = styled.div.attrs({
+  style: ({ direction, x, y }) => ({
+    backgroundPositionY: getBackgroundPositionY(direction),
+    left: `${x * SIDE}px`,
+    top: `${y * SIDE}px`,
+  }),
+})`
+  background-image: url(${props => props.sprite});
   width: ${SIDE}px;
   height: ${SIDE}px;
   position: absolute;
-  /*background: ${props => {
-    return props.status === 'ALIVE' ? props.color : 'red'
-  }};*/
-  background-image: url(${background});
   background-repeat: no-repeat;
-  animation: ${walk} 0.5s steps(2) infinite;
-  background-position-y: ${({ direction }) => {
-    switch (direction) {
-      case RIGHT:
-        return `0px`
-      case LEFT:
-        return `-${SIDE}px`
-      case UP:
-        return `-${SIDE * 2}px`
-      case DOWN:
-        return `-${SIDE * 3}px`
-    }
-  }}; 
-  left: ${props => props.x * SIDE}px;
-  top: ${props => props.y * SIDE}px;
+  animation: ${walk} 0.4s steps(2) infinite;
+  transition: left 0.25s linear, top 0.25s linear;
 `
 
 const Character = props => {
@@ -39,6 +42,7 @@ const Character = props => {
 Character.propTypes = {
   x: PropTypes.number.isRequired,
   y: PropTypes.number.isRequired,
+  sprite: PropTypes.string,
   direction: PropTypes.number,
   status: PropTypes.string,
   color: PropTypes.string,
