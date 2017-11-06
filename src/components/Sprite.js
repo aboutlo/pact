@@ -27,13 +27,13 @@ const Tile = styled.div.attrs({
     top: `${y * SIDE}px`,
   }),
 })`
+  position: absolute;
+  background-repeat: no-repeat;
   background-image: url(${props => props.sprite});
   width: ${SIDE}px;
   height: ${SIDE}px;
-  position: absolute;
-  background-repeat: no-repeat;
-  animation: ${walk} 0.4s steps(2) infinite;
-  /*transition: left 0.25s linear, top 0.25s linear;*/
+  ${({ status, direction }) =>
+    status === 'DEAD' || direction === undefined ? '' : `animation: ${walk} 0.4s steps(2) infinite;`};
 `
 
 const Character = props => {

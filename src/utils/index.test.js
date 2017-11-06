@@ -1,6 +1,6 @@
 import { LEFT, RIGHT, DOWN, UP } from '../constants/directions'
 import { ALIVE, DEAD, INVALID } from '../constants/status'
-import { move, health, obstacle, findPath, pipe } from './index'
+import { move, health, walls, findPath, pipe } from './index'
 describe('utils', () => {
   let character
 
@@ -62,7 +62,7 @@ describe('utils', () => {
     })
   })
 
-  describe('health', () => {
+  describe.only('health', () => {
     let character
 
     beforeEach(() => {
@@ -85,7 +85,7 @@ describe('utils', () => {
     })
   })
 
-  describe('obstacle', () => {
+  describe('walls', () => {
     // prettier-ignore
     const map = [
       '###',
@@ -99,7 +99,7 @@ describe('utils', () => {
         y: 1,
         status: ALIVE,
       }
-      expect(obstacle(map, character)).toHaveProperty('status', ALIVE)
+      expect(walls(map, character)).toHaveProperty('status', ALIVE)
     })
 
     it('invalid', () => {
@@ -108,7 +108,7 @@ describe('utils', () => {
         y: 0,
         status: ALIVE,
       }
-      expect(obstacle(map, character)).toHaveProperty('status', INVALID)
+      expect(walls(map, character)).toHaveProperty('status', INVALID)
     })
   })
 
@@ -126,7 +126,7 @@ describe('utils', () => {
         '# #',
         '###'
       ]
-      expect(pipe(move, health(phantoms), obstacle(map))(character)).toMatchObject({
+      expect(pipe(move, health(phantoms), walls(map))(character)).toMatchObject({
         ...character,
       })
     })
@@ -149,7 +149,7 @@ describe('utils', () => {
         '# #',
         '###'
       ]
-      expect(pipe(move, obstacle(map), health(phantoms))(character)).toMatchObject({
+      expect(pipe(move, walls(map), health(phantoms))(character)).toMatchObject({
         ...character,
         status: DEAD,
       })
@@ -168,7 +168,7 @@ describe('utils', () => {
         },
       ]
       const map = ['#']
-      expect(pipe(move, obstacle(map), health(phantoms))(character)).toMatchObject({
+      expect(pipe(move, walls(map), health(phantoms))(character)).toMatchObject({
         ...character,
         status: DEAD,
       })
@@ -190,7 +190,7 @@ describe('utils', () => {
         '#  #',//1
         '####' //2
       ]
-      const f = pipe(move, health(phantoms), obstacle(map))
+      const f = pipe(move, health(phantoms), walls(map))
       expect(findPath(f, character)).toMatchObject({
         x: 1,
         y: 1,
@@ -198,7 +198,7 @@ describe('utils', () => {
       })
     })
 
-    it.only('pipe', () => {
+    it('pipe', () => {
       const character = {
         x: 1,
         y: 0,
@@ -216,8 +216,8 @@ describe('utils', () => {
       const f = pipe(
         move,
         health(phantoms),
-        obstacle(map),
-        findPath(pipe(move,obstacle(map)))
+        walls(map),
+        findPath(pipe(move,walls(map)))
       )
       expect(f(character)).toMatchObject({
         x: 1,

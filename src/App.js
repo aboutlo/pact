@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import './App.css'
 import Map from './components/map'
-import { move, health, obstacle, findPath, pipe } from './utils'
+import { move, health, walls, findPath, points, pipe } from './utils'
 import { DEAD, ALIVE, INVALID } from './constants/status'
 import { LEFT } from './constants/directions'
 
@@ -64,8 +64,15 @@ const initialState = {
 let reqAnimation
 const fps = 3
 
-const tickCharacter = state => pipe(move, health(state.phantoms), obstacle(state.level))
-const tickPhantom = state => pipe(move, obstacle(state.level))
+const tickCharacter = ({ phantoms, level }) => character => {
+  const sprite = pipe(
+    current => (current.status === INVALID ? health(phantoms)(character) : health(phantoms)(current)),
+    current => (current.status === DEAD ? current : move(current)),
+    walls(level)
+  )(character)
+  return sprite.status === INVALID ? character : sprite
+}
+const tickPhantom = state => pipe(move, walls(state.level))
 let start = null
 
 class App extends Component {
@@ -96,31 +103,18 @@ class App extends Component {
     const phantoms = Object.entries(this.state.phantoms)
       .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
-    // use reduce to map and count
-    let score = this.state.score
+
+    const score = this.state.score + points(this.state.level, character)
+
     const level = this.state.level.map((row, y) => {
       return row
         .split('')
-        .map((tile, x) => {
-          // eating dots has to be more idiomatic and without side effect
-          // I could store the tile into the character and calculate the score later
-          if (y === character.y && x === character.x && character.status !== INVALID) {
-            if (tile === '·') {
-              score += 5
-            }
-            if (tile === '●') {
-              score += 50
-            }
-            return ' '
-          }
-          return tile
-        })
+        .map((tile, x) => (y === character.y && x === character.x && character.status !== INVALID ? ' ' : tile))
         .join('')
     })
 
     this.setState({
-      // TODO LS move this login into a function eg. shouldUpdate
-      character: character.status === INVALID ? this.state.character : character,
+      character,
       phantoms,
       score,
       level,

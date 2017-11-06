@@ -42,17 +42,34 @@ export const move = character => {
 export const health = curry((phantoms, character) => {
   const { x, y } = character
   const points = Object.entries(phantoms).map(([k, v]) => v)
+  const hits = points.filter(p => p.x === x && p.y === y)
   return {
     ...character,
-    status: points.filter(p => p.x === x && p.y === y).pop() ? DEAD : ALIVE,
+    status: hits.pop() ? DEAD : ALIVE,
   }
 })
-export const obstacle = curry((map, character) => {
-  const { x, y, status } = character
+export const walls = curry((map, character) => {
+  const { x, y } = character
   const tile = map[y][x]
+  const status = tile === '#' || tile === undefined ? INVALID : character.status
+  const direction = status === INVALID ? undefined : character.direction
   return {
     ...character,
-    status: tile === '#' || tile === undefined ? INVALID : status,
+    direction,
+    status,
+  }
+})
+export const points = curry((map, character) => {
+  const { x, y, status } = character
+  if (character.status === INVALID) return 0
+  const tile = map[y][x]
+  switch (tile) {
+    case '●':
+      return 50
+    case '·':
+      return 5
+    default:
+      return 0
   }
 })
 
