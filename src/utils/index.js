@@ -39,6 +39,7 @@ export const move = character => {
       return character
   }
 }
+// TODO LS add prev character state
 export const health = curry((phantoms, character) => {
   const { x, y } = character
   const points = Object.entries(phantoms).map(([k, v]) => v)

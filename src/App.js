@@ -65,11 +65,9 @@ let reqAnimation
 const fps = 3
 
 const tickCharacter = ({ phantoms, level }) => character => {
-  const sprite = pipe(
-    current => (current.status === INVALID ? health(phantoms)(character) : health(phantoms)(current)),
-    current => (current.status === DEAD ? current : move(current)),
-    walls(level)
-  )(character)
+  const sprite = pipe(health(phantoms), current => (current.status === DEAD ? current : move(current)), walls(level))(
+    character
+  )
   return sprite.status === INVALID ? character : sprite
 }
 const tickPhantom = state => pipe(move, walls(state.level))

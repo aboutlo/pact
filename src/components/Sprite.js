@@ -33,6 +33,7 @@ const Tile = styled.div.attrs({
   width: ${SIDE}px;
   height: ${SIDE}px;
   ${({ status, direction }) =>
+    // TODO STOP ANIMATION IF HITTING THE WALL
     status === 'DEAD' || direction === undefined ? '' : `animation: ${walk} 0.4s steps(2) infinite;`};
 `
 
