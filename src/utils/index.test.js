@@ -1,6 +1,6 @@
 import { LEFT, RIGHT, DOWN, UP } from '../constants/directions'
 import { ALIVE, DEAD, INVALID } from '../constants/status'
-import { move, health, walls, findPath, pipe } from './index'
+import { move, health, walls, getDirection, findPath, finder, isIntersection, pipe } from './index'
 describe('utils', () => {
   let character
 
@@ -224,6 +224,126 @@ describe('utils', () => {
         y: 1,
         status: ALIVE,
       })
+    })
+  })
+
+  describe('finder', () => {
+    describe('getDirection', () => {
+      it('DOWN', () => {
+        const tile = { x: 1, y: 1 }
+        const target = { x: 1, y: 2 }
+        expect(getDirection(tile, target)).toEqual(DOWN)
+      })
+
+      it('UP', () => {
+        const tile = { x: 1, y: 1 }
+        const target = { x: 1, y: 0 }
+        expect(getDirection(tile, target)).toEqual(UP)
+      })
+
+      it('RIGHT', () => {
+        const tile = { x: 1, y: 1 }
+        const target = { x: 2, y: 1 }
+        expect(getDirection(tile, target)).toEqual(RIGHT)
+      })
+
+      it('LEFT', () => {
+        const tile = { x: 1, y: 1 }
+        const target = { x: 0, y: 1 }
+        expect(getDirection(tile, target)).toEqual(LEFT)
+      })
+    })
+
+    describe('isIntersection', () => {
+      describe('cross', () => {
+        // prettier-ignore
+        const map = [
+          '#####',
+          '##·##',
+          '#·x·#',
+          '##·##',
+          '#####',
+        ]
+
+        it('true', () => {
+          const tile = { x: 2, y: 2 }
+          expect(isIntersection(map, tile)).toBe(true)
+        })
+
+        it('false', () => {
+          const tile = { x: 2, y: 1 }
+          expect(isIntersection(map, tile)).toBe(false)
+        })
+      })
+
+      describe('cross', () => {
+        // prettier-ignore
+        const map = [
+          '#####',
+          '##x·#',
+          '##·##',
+          '##·##',
+          '#####',
+        ]
+
+        it('true', () => {
+          const tile = { x: 2, y: 1 }
+          expect(isIntersection(map, tile)).toBe(true)
+        })
+
+        it('false', () => {
+          const tile = { x: 2, y: 1 }
+          expect(isIntersection(map, tile)).toBe(false)
+        })
+      })
+    })
+
+    describe('finder', () => {
+      // prettier-ignore
+      const map = [
+        '############################',
+        '#●···········##···········●#',
+        '#·####·#####·##·#####·####·#',
+        '#·####·#####·##·#####·####·#',
+        '#·····●··············●·····#',
+        '#·####·##·########·##·####·#',
+        '#·####·##····##····##·####·#',
+        '#······#####·##·#####······#',
+        '######·#####·##·#####·######',
+        '######·##··········##·######',
+        '######·##·###··###·##·######',
+        '######·##·#······#·##·######',
+        '······●···#······#···●······',
+        '######·##·#······#·##·######',
+        '######·##·########·##·######',
+        '######·##··········##·######',
+        '######·##·########·##·######',
+        '#·····●······##······●·····#',
+        '#·####·#####·##·#####·####·#',
+        '#···##················##···#',
+        '###·##·#·##########·#·##·###',
+        '#······#·····##·····#······#',
+        '#·##########·##·##########·#',
+        '#●························●#',
+        '############################',
+        ]
+      it.only('run', () => {
+        const pacman = {
+          x: 1,
+          y: 1,
+        }
+        const ghost = {
+          x: 7,
+          y: 2,
+        }
+        expect(finder(map, pacman, ghost)).toMatchObject({
+          x: 7,
+          y: 1,
+          direction: LEFT,
+        })
+      })
+
+      it.only('pipe', () => {})
     })
   })
 })

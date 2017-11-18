@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import './App.css'
 import Map from './components/map'
-import { move, health, walls, findPath, points, pipe } from './utils'
+import { move, health, walls, findPath, points, finder, isIntersection, pipe } from './utils'
 import { DEAD, ALIVE, INVALID } from './constants/status'
-import { LEFT } from './constants/directions'
+import { LEFT, DOWN, UP } from './constants/directions'
 
 const initialState = {
   lives: 3,
@@ -17,19 +17,19 @@ const initialState = {
     direction: undefined,
   },
   phantoms: {
-    yellow: {
-      y: 8,
-      x: 12,
-      color: 'yellow',
-      status: ALIVE,
-      direction: LEFT,
-    },
+    // yellow: {
+    //   y: 8,
+    //   x: 12,
+    //   color: 'yellow',
+    //   status: ALIVE,
+    //   direction: LEFT,
+    // },
     purple: {
-      y: 1,
-      x: 11,
+      y: 17,
+      x: 9,
       color: 'purple',
       status: ALIVE,
-      direction: LEFT,
+      direction: UP,
     },
   },
   level: [
@@ -70,7 +70,7 @@ const tickCharacter = ({ phantoms, level }) => character => {
   )
   return sprite.status === INVALID ? character : sprite
 }
-const tickPhantom = state => pipe(move, walls(state.level))
+const tickPhantom = state => pipe(finder(state.level, state.character))
 let start = null
 
 class App extends Component {
@@ -99,7 +99,7 @@ class App extends Component {
       return
     }
     const phantoms = Object.entries(this.state.phantoms)
-      .map(([key, phantom]) => ({ [key]: findPath(tickPhantom(this.state), phantom) }))
+      .map(([key, phantom]) => ({ [key]: tickPhantom(this.state)(phantom) }))
       .reduce((memo, phantom) => ({ ...phantom, ...memo }), {})
 
     const score = this.state.score + points(this.state.level, character)
