@@ -128,7 +128,7 @@ export const finder = curry((level, target, character) => {
     const t = hasPath ? target : DEFAULT_INTERSECTIONS[Math.round(Math.random() * (DEFAULT_INTERSECTIONS.length - 1))]
     path = finder.findPath(character.x, character.y, t.x, t.y, grid)
   }
-  console.log(path)
+  // console.log(path)
   const [x, y] = path[1] || [character.x, character.y]
   const direction = getDirection({ x, y }, target)
   return {

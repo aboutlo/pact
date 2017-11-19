@@ -4,6 +4,7 @@ import Map from './components/map'
 import { move, health, walls, findPath, points, finder, isIntersection, pipe } from './utils'
 import { DEAD, ALIVE, INVALID } from './constants/status'
 import { LEFT, DOWN, UP } from './constants/directions'
+import Console from './components/Console'
 
 const initialState = {
   lives: 3,
@@ -149,16 +150,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">React Man</h1>
-          <ul>
-            <li>lives:{Array.from({ length: this.state.lives }).map(life => '❤️')}️</li>
-            <li>score:{this.state.score}</li>
-            <li>time:</li>
-            <li>level:1</li>
-          </ul>
-        </header>
         <main>
+          <header className="App-header">
+            <h1 className="App-title">Ract Man</h1>
+            <Console level={1} score={this.state.score} lives={this.state.lives} />
+          </header>
           <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
         </main>
       </div>

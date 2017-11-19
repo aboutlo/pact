@@ -3,38 +3,40 @@ import PropTypes from 'prop-types'
 import styled, { css, keyframes } from 'styled-components'
 import { LEFT, RIGHT, DOWN, UP } from '../constants/directions'
 
-const SIDE = 16
-const walk = keyframes`
-  100% {background-position-x: -32px;}
+const walk = ({ side }) => keyframes`
+  100% {
+    background-position-x: ${-32 * side / 16}px;
 `
 
-const getBackgroundPositionY = direction => {
+const getBackgroundPositionY = (direction, side) => {
   switch (direction) {
     case RIGHT:
       return `0px`
     case LEFT:
-      return `-${SIDE}px`
+      return `-${side}px`
     case UP:
-      return `-${SIDE * 2}px`
+      return `-${side * 2}px`
     case DOWN:
-      return `-${SIDE * 3}px`
+      return `-${side * 3}px`
   }
 }
 const Tile = styled.div.attrs({
-  style: ({ direction, x, y }) => ({
-    backgroundPositionY: getBackgroundPositionY(direction),
-    left: `${x * SIDE}px`,
-    top: `${y * SIDE}px`,
+  style: ({ direction, x, y, side }) => ({
+    backgroundPositionY: getBackgroundPositionY(direction, side),
+    left: `${x * side}px`,
+    top: `${y * side}px`,
   }),
 })`
   position: absolute;
   background-repeat: no-repeat;
   background-image: url(${props => props.sprite});
-  width: ${SIDE}px;
-  height: ${SIDE}px;
-  ${({ status, direction }) =>
+  background-size: ${({ side }) => `${32 * side / 16}px ${64 * side / 16}px`};
+  width: ${({ side }) => side}px;
+  height: ${({ side }) => side}px;
+  ${({ status, direction, side }) => {
     // TODO STOP ANIMATION IF HITTING THE WALL
-    status === 'DEAD' || direction === undefined ? '' : `animation: ${walk} 0.4s steps(2) infinite;`};
+    return status === 'DEAD' || direction === undefined ? '' : `animation: ${walk({ side })} 0.4s steps(2) infinite;`
+  }};
 `
 
 const Character = props => {
@@ -47,6 +49,7 @@ Character.propTypes = {
   direction: PropTypes.number,
   status: PropTypes.string,
   color: PropTypes.string,
+  side: PropTypes.number,
 }
 
 export default Character

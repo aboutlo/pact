@@ -6,13 +6,15 @@ import pacmanAsset from '../assets/pacman.png'
 import pacgirlAsset from '../assets/pacgirl.png'
 import phantomAsset from '../assets/blinky.png'
 
-const SIDE = 16
+// const SIDE = 16
 const Tile = styled.div`
+  // move to css attributes
+  width: ${({ side }) => side}px;
+  height: ${({ side }) => side}px;
   background: ${({ children }) => (children === '#' ? 'blue' : 'black')};
-  width: ${SIDE}px;
-  height: ${SIDE}px;
   color: yellow;
-  text-indent: ${({ children }) => (children === '#' ? '-2000px' : 'none')};
+  text-align: center;
+  text-indent: ${({ children }) => (children === '#' ? '-9000px' : 0)};
 `
 
 const Container = styled.div`
@@ -26,17 +28,28 @@ const Level = styled.div`
   margin: auto;
 `
 
-const Row = ({ data }) => {
+const Row = ({ data, side }) => {
   const tiles = data.split('')
-  return <Container>{tiles.map((tile, key) => <Tile key={key}>{tile}</Tile>)}</Container>
+  return (
+    <Container>
+      {tiles.map((tile, key) => (
+        <Tile key={key} side={side}>
+          {tile}
+        </Tile>
+      ))}
+    </Container>
+  )
 }
 
 const Map = ({ level, character, phantoms }) => {
+  const side = Math.min(window.innerWidth / level[0].length, (window.innerHeight - 200) / level.length)
   return (
-    <Level width={level[0].length * SIDE} height={level.length * SIDE}>
-      <div>{level.map((str, key) => <Row key={key} data={str} />)}</div>
-      {Object.entries(phantoms).map(([k, phantom]) => <Character key={k} {...phantom} sprite={phantomAsset} />)}
-      <Character {...character} sprite={pacgirlAsset} />
+    <Level width={level[0].length * side} height={level.length * side}>
+      <div>{level.map((str, key) => <Row key={key} data={str} side={side} />)}</div>
+      {Object.entries(phantoms).map(([k, phantom]) => (
+        <Character side={side} key={k} {...phantom} sprite={phantomAsset} />
+      ))}
+      <Character side={side} {...character} sprite={pacgirlAsset} />
     </Level>
   )
 }
