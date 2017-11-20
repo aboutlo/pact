@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
+import Hammer from 'react-hammerjs'
 import './App.css'
 import Map from './components/map'
 import { move, health, walls, findPath, points, finder, isIntersection, pipe } from './utils'
 import { DEAD, ALIVE, INVALID } from './constants/status'
-import { LEFT, DOWN, UP } from './constants/directions'
+import { LEFT, DOWN, UP, RIGHT } from './constants/directions'
 import Console from './components/Console'
 
 const initialState = {
@@ -123,7 +124,6 @@ class App extends Component {
       reqAnimation = requestAnimationFrame(timestamp => this.tick(timestamp))
     }, 1000 / fps)
   }
-  x
 
   componentDidMount() {
     window.addEventListener(
@@ -147,15 +147,65 @@ class App extends Component {
     this.stop()
   }
 
+  pan(e) {
+    const direction = direction => {
+      switch (direction) {
+        case 'panleft':
+          return '⬅️'
+        case 'panright':
+          return '➡️'
+        case 'pandown':
+          return '⬇️️'
+        case 'panup':
+          return '⬆️️'
+      }
+    }
+    const toKeyCode = direction => {
+      switch (direction) {
+        case 'panleft':
+          return LEFT
+        case 'panright':
+          return RIGHT
+        case 'pandown':
+          return DOWN
+        case 'panup':
+          return UP
+      }
+    }
+    console.log(e.additionalEvent, e.direction, direction(e.additionalEvent))
+    const character = {
+      ...this.state.character,
+      direction: toKeyCode(e.additionalEvent),
+    }
+    this.setState({
+      character,
+    })
+    // console.log(e)
+    // console.log(e.additionalEvent, e.direction, direction(e.direction))
+  }
+
   render() {
+    const options = {
+      touchAction: 'compute',
+      recognizers: {
+        tap: {
+          time: 600,
+          threshold: 100,
+        },
+      },
+    }
     return (
       <div className="App">
         <main>
           <header className="App-header">
             <h1 className="App-title">Ract Man</h1>
-            <Console level={1} score={this.state.score} lives={this.state.lives} />
           </header>
           <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
+          <Hammer onPan={this.pan.bind(this)} options={options}>
+            <div>
+              <Console lives={this.state.lives} score={this.state.score} level={1} direction={this.state.direction} />
+            </div>
+          </Hammer>
         </main>
       </div>
     )
