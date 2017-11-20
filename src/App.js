@@ -200,9 +200,9 @@ class App extends Component {
           <header className="App-header">
             <h1 className="App-title">Ract Man</h1>
           </header>
-          <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
           <Hammer onPan={this.pan.bind(this)} options={options}>
             <div>
+              <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
               <Console lives={this.state.lives} score={this.state.score} level={1} direction={this.state.direction} />
             </div>
           </Hammer>
