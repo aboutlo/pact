@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
+import { DOWN, LEFT, RIGHT, UP } from '../constants/directions'
 
 const Container = styled.ul`
   display: flex;
@@ -15,6 +16,19 @@ const Item = styled.li`
   flex: 0;
   min-width: 100px;
 `
+
+const toEmoji = direction => {
+  switch (direction) {
+    case LEFT:
+      return '⬅️'
+    case RIGHT:
+      return '➡️'
+    case DOWN:
+      return '⬇️️'
+    case UP:
+      return '⬆️️'
+  }
+}
 class Console extends React.Component {
   render() {
     const { level, score, lives, direction } = this.props
@@ -23,8 +37,7 @@ class Console extends React.Component {
         <Item>{Array.from({ length: lives }).map(life => '❤️')}</Item>
         <Item>{score} points</Item>
         <Item>{level} level</Item>
-        <Item>{level} level</Item>
-        <Item>{direction}</Item>
+        <Item>{toEmoji(direction)}</Item>
       </Container>
     )
   }

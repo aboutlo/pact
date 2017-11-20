@@ -7,6 +7,19 @@ import { DEAD, ALIVE, INVALID } from './constants/status'
 import { LEFT, DOWN, UP, RIGHT } from './constants/directions'
 import Console from './components/Console'
 
+const toKeyCode = direction => {
+  switch (direction) {
+    case 'panleft':
+      return LEFT
+    case 'panright':
+      return RIGHT
+    case 'pandown':
+      return DOWN
+    case 'panup':
+      return UP
+  }
+}
+
 const initialState = {
   lives: 3,
   time: Date.now(),
@@ -64,7 +77,7 @@ const initialState = {
 }
 
 let reqAnimation
-const fps = 3
+const fps = 5
 
 const tickCharacter = ({ phantoms, level }) => character => {
   const sprite = pipe(health(phantoms), current => (current.status === DEAD ? current : move(current)), walls(level))(
@@ -148,40 +161,13 @@ class App extends Component {
   }
 
   pan(e) {
-    const direction = direction => {
-      switch (direction) {
-        case 'panleft':
-          return '⬅️'
-        case 'panright':
-          return '➡️'
-        case 'pandown':
-          return '⬇️️'
-        case 'panup':
-          return '⬆️️'
-      }
-    }
-    const toKeyCode = direction => {
-      switch (direction) {
-        case 'panleft':
-          return LEFT
-        case 'panright':
-          return RIGHT
-        case 'pandown':
-          return DOWN
-        case 'panup':
-          return UP
-      }
-    }
-    console.log(e.additionalEvent, e.direction, direction(e.additionalEvent))
     const character = {
       ...this.state.character,
-      direction: toKeyCode(e.additionalEvent),
+      direction: toKeyCode(e.additionalEvent) || this.state.character.direction,
     }
     this.setState({
       character,
     })
-    // console.log(e)
-    // console.log(e.additionalEvent, e.direction, direction(e.direction))
   }
 
   render() {
@@ -203,7 +189,12 @@ class App extends Component {
           <Hammer onPan={this.pan.bind(this)} options={options}>
             <div>
               <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
-              <Console lives={this.state.lives} score={this.state.score} level={1} direction={this.state.direction} />
+              <Console
+                lives={this.state.lives}
+                score={this.state.score}
+                level={1}
+                direction={this.state.character.direction}
+              />
             </div>
           </Hammer>
         </main>

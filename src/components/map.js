@@ -11,6 +11,7 @@ const Tile = styled.div`
   // move to css attributes
   width: ${({ side }) => side}px;
   height: ${({ side }) => side}px;
+  line-height: ${({ side }) => side}px;
   background: ${({ children }) => (children === '#' ? 'blue' : 'black')};
   color: yellow;
   text-align: center;
