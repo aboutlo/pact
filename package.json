@@ -11,16 +11,18 @@
     "styled-components": "^2.2.2"
   },
   "now": {
-    "alias": "pact"
+    "alias": "pacman"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "deploy": "rm -f build/static/js/*.js.map  && now build --public"
+    "now:deploy": "yarn run build && rm -f build/static/js/*.js.map && now build --public",
+    "now:alias": "now alias build-ovczggfwpr.now.sh pacman"
   },
   "devDependencies": {
+    "now": "^8.5.4",
     "prettier": "^1.7.4"
   }
 }
