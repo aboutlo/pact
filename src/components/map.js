@@ -50,10 +50,15 @@ const Row = ({ data, side }) => {
 }
 
 const Map = ({ level, character, phantoms }) => {
-  const side = Math.min(window.innerWidth / level[0].length, (window.innerHeight - 200) / level.length)
+  const side = Math.min(
+    window.innerWidth / level[0].length,
+    (window.innerHeight - 200) / level.length
+  )
   return (
     <Level width={level[0].length * side} height={level.length * side}>
-      <div>{level.map((str, key) => <Row key={key} data={str} side={side} />)}</div>
+      <div>
+        {level.map((str, key) => <Row key={key} data={str} side={side} />)}
+      </div>
       {Object.entries(phantoms).map(([k, phantom]) => (
         <Character side={side} key={k} {...phantom} sprite={phantomAsset} />
       ))}

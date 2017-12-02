@@ -112,6 +112,7 @@ class App extends Component {
   tick(timestamp) {
     if (!start) start = timestamp
 
+    //TODO move this into Stage component
     const character = tickCharacter(this.state)(this.state.character)
     if (character.status === DEAD) {
       this.stop()
