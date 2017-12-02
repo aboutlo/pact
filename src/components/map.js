@@ -1,8 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import Character from './Sprite'
-import pacmanAsset from '../assets/pacman.png'
 import pacgirlAsset from '../assets/pacgirl.png'
 import phantomAsset from '../assets/blinky.png'
 
@@ -31,11 +30,19 @@ const Level = styled.div`
 
 const Row = ({ data, side }) => {
   const tiles = data.split('')
+  const map = tile => {
+    switch (tile) {
+      case '●':
+        return '💅'
+      default:
+        return tile
+    }
+  }
   return (
     <Container>
       {tiles.map((tile, key) => (
         <Tile key={key} side={side}>
-          {tile}
+          {map(tile)}
         </Tile>
       ))}
     </Container>

@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import Hammer from 'react-hammerjs'
-import './App.css'
 import Map from './components/map'
-import { move, health, walls, findPath, points, finder, isIntersection, pipe } from './utils'
+import { move, health, walls, points, finder, pipe } from './utils'
 import { DEAD, ALIVE, INVALID } from './constants/status'
-import { LEFT, DOWN, UP, RIGHT } from './constants/directions'
+import DIRECTIONS, { LEFT, DOWN, UP, RIGHT } from './constants/directions'
 import Console from './components/Console'
+import Page from './components/Page'
 
 const toKeyCode = direction => {
   switch (direction) {
@@ -17,6 +17,8 @@ const toKeyCode = direction => {
       return DOWN
     case 'panup':
       return UP
+    default:
+      throw new Error(`toKeyCode: '${direction}' direction not supported`)
   }
 }
 
@@ -80,9 +82,12 @@ let reqAnimation
 const fps = 5
 
 const tickCharacter = ({ phantoms, level }) => character => {
-  const sprite = pipe(health(phantoms), current => (current.status === DEAD ? current : move(current)), walls(level))(
-    character
-  )
+  //prettier-ignore
+  const sprite = pipe(
+    health(phantoms),
+    current => (current.status === DEAD ? current : move(current)),
+    walls(level)
+  )(character)
   return sprite.status === INVALID ? character : sprite
 }
 const tickPhantom = state => pipe(finder(state.level, state.character))
@@ -95,7 +100,9 @@ class App extends Component {
   }
 
   start() {
-    reqAnimation = window.requestAnimationFrame(timestamp => this.tick(timestamp))
+    reqAnimation = window.requestAnimationFrame(timestamp =>
+      this.tick(timestamp)
+    )
   }
 
   stop() {
@@ -122,7 +129,14 @@ class App extends Component {
     const level = this.state.level.map((row, y) => {
       return row
         .split('')
-        .map((tile, x) => (y === character.y && x === character.x && character.status !== INVALID ? ' ' : tile))
+        .map(
+          (tile, x) =>
+            y === character.y &&
+            x === character.x &&
+            character.status !== INVALID
+              ? ' '
+              : tile
+        )
         .join('')
     })
 
@@ -142,11 +156,11 @@ class App extends Component {
     window.addEventListener(
       'keydown',
       e => {
+        if (!DIRECTIONS.includes(e.keyCode)) return
         const character = {
           ...this.state.character,
           direction: e.keyCode,
         }
-        // console.log('keydown character:', character)
         this.setState({
           character,
         })
@@ -181,24 +195,31 @@ class App extends Component {
       },
     }
     return (
-      <div className="App">
-        <main>
-          <header className="App-header">
-            <h1 className="App-title">Ract Man</h1>
-          </header>
-          <Hammer onPan={this.pan.bind(this)} options={options}>
-            <div>
-              <Map level={this.state.level} character={this.state.character} phantoms={this.state.phantoms} />
-              <Console
-                lives={this.state.lives}
-                score={this.state.score}
-                level={1}
-                direction={this.state.character.direction}
-              />
-            </div>
-          </Hammer>
-        </main>
-      </div>
+      <Page>
+        <header className="App-header">
+          <h1 className="App-title">
+            Pac-Man with Styled Components{' '}
+            <span role="img" aria-label="Styled components logo">
+              💅
+            </span>
+          </h1>
+        </header>
+        <Hammer onPan={this.pan.bind(this)} options={options}>
+          <div>
+            <Map
+              level={this.state.level}
+              character={this.state.character}
+              phantoms={this.state.phantoms}
+            />
+            <Console
+              lives={this.state.lives}
+              score={this.state.score}
+              level={1}
+              direction={this.state.character.direction}
+            />
+          </div>
+        </Hammer>
+      </Page>
     )
   }
 }

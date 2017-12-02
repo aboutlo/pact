@@ -7,7 +7,7 @@ const Container = styled.ul`
   display: flex;
   flex: 1;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   list-style: none;
   border: 1px solid red;
 `
@@ -27,6 +27,10 @@ const toEmoji = direction => {
       return '⬇️️'
     case UP:
       return '⬆️️'
+    case undefined:
+      return ''
+    default:
+      throw new Error(`toEmoji ${direction} direction not supported`)
   }
 }
 class Console extends React.Component {

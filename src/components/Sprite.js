@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { LEFT, RIGHT, DOWN, UP } from '../constants/directions'
 
 const walk = ({ side }) => keyframes`
@@ -18,6 +18,11 @@ const getBackgroundPositionY = (direction, side) => {
       return `-${side * 2}px`
     case DOWN:
       return `-${side * 3}px`
+    case undefined:
+      return ''
+    default:
+      console.log(arguments)
+      throw new Error(`getBackgroundPositionY ${direction} direction not supported`)
   }
 }
 const Tile = styled.div.attrs({

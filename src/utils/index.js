@@ -65,7 +65,7 @@ export const walls = curry((map, character) => {
 })
 export const points = curry((map, character) => {
   const { x, y, status } = character
-  if (character.status === INVALID) return 0
+  if (status === INVALID) return 0
   const tile = map[y][x]
   switch (tile) {
     case '●':

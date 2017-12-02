@@ -14,12 +14,3 @@ body {
   color: white;
 }
 
-main {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  overflow: hidden;
-  height: 100%;
-  align-items: center;
-  /*border: solid 1px red ;*/
-}
