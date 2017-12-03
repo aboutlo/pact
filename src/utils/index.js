@@ -4,6 +4,21 @@ import PF from 'pathfinding'
 
 const DEFAULT_INTERSECTIONS = [{ x: 6, y: 4 }, { x: 21, y: 4 }, { x: 6, y: 17 }, { x: 21, y: 17 }]
 
+export const gestureToDirection = gesture => {
+  switch (gesture) {
+    case 'panleft':
+      return LEFT
+    case 'panright':
+      return RIGHT
+    case 'pandown':
+      return DOWN
+    case 'panup':
+      return UP
+    default:
+      throw new Error(`gestureToDirection: '${gesture}' gesture not supported`)
+  }
+}
+
 export const pipe = (f1, ...fns) => (...args) => {
   return fns.reduce((res, fn) => fn(res), f1(...args))
 }
