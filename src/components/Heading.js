@@ -6,6 +6,7 @@ const Heading = styled(({ level, children, ...props }) =>
   React.createElement(`h${level}`, props, children)
 )`
   text-align: center;
+  color: ${props => props.color};
 `
 
 Heading.propTypes = {

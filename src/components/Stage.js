@@ -3,6 +3,7 @@ import Hammer from 'react-hammerjs'
 
 import { DEAD, ALIVE, INVALID } from '../constants/status'
 import DIRECTIONS, { UP } from '../constants/directions'
+import GameOver from '../components/GameOver'
 import Map from '../components/map'
 import Console from '../components/Console'
 import {
@@ -18,6 +19,13 @@ import {
 const initialState = {
   lives: 3,
   time: Date.now(),
+  scores: JSON.parse(localStorage.getItem('scores') || '[]')
+    .sort((a, b) => {
+      if (a.score < b.score) return 1
+      if (a.score > b.score) return -1
+      return 0
+    })
+    .slice(0, 3),
   score: 0,
   character: {
     y: 1,
@@ -84,14 +92,20 @@ const hammerOptions = {
 let reqAnimation
 const fps = 5
 
-const tickCharacter = ({ phantoms, level }) => character => {
+const tickCharacter = ({ phantoms, level }) => prev => {
   //prettier-ignore
-  const sprite = pipe(
+  const next = pipe(
     health(phantoms),
     current => (current.status === DEAD ? current : move(current)),
     walls(level)
-  )(character)
-  return sprite.status === INVALID ? character : sprite
+  )(prev)
+  switch (next.status) {
+    case INVALID:
+      return prev
+    case DEAD:
+    default:
+      return next
+  }
 }
 const tickPhantom = state => pipe(finder(state.level, state.character))
 let start = null
@@ -109,18 +123,25 @@ class Stage extends Component {
   }
 
   stop() {
-    cancelAnimationFrame(reqAnimation)
+    console.log('stop:', reqAnimation)
+    window.cancelAnimationFrame(reqAnimation)
+    reqAnimation = undefined
   }
 
   tick(timestamp) {
     if (!start) start = timestamp
+    if (!reqAnimation) return
+    console.log('tick:', timestamp)
 
     //TODO move this into Stage component
     const character = tickCharacter(this.state)(this.state.character)
     if (character.status === DEAD) {
       this.stop()
-      this.setState({
-        character,
+      this.setState(prevState => {
+        return {
+          lives: prevState.lives - 1,
+          character: initialState.character,
+        }
       })
       return
     }
@@ -204,6 +225,9 @@ class Stage extends Component {
             level={1}
             direction={this.state.character.direction}
           />
+          {this.state.lives === 0 && (
+            <GameOver score={this.state.score} scores={this.state.scores} />
+          )}
         </div>
       </Hammer>
     )
