@@ -123,7 +123,6 @@ class Stage extends Component {
   }
 
   stop() {
-    console.log('stop:', reqAnimation)
     window.cancelAnimationFrame(reqAnimation)
     reqAnimation = undefined
   }
@@ -131,18 +130,19 @@ class Stage extends Component {
   tick(timestamp) {
     if (!start) start = timestamp
     if (!reqAnimation) return
-    console.log('tick:', timestamp)
 
     //TODO move this into Stage component
     const character = tickCharacter(this.state)(this.state.character)
     if (character.status === DEAD) {
-      this.stop()
       this.setState(prevState => {
         return {
           lives: prevState.lives - 1,
           character: initialState.character,
         }
       })
+      setTimeout(() => {
+        reqAnimation = requestAnimationFrame(timestamp => this.tick(timestamp))
+      }, 1000 / fps)
       return
     }
     const phantoms = Object.entries(this.state.phantoms)

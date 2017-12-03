@@ -19,7 +19,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "now:deploy": "yarn run build && rm -f build/static/js/*.js.map && now build --public",
-    "now:alias": "now alias build-ovczggfwpr.now.sh pacman"
+    "now:alias": "now alias https://build-phovzgqkuo.now.sh pacman"
   },
   "devDependencies": {
     "now": "^8.5.4",
